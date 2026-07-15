@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sales Intelligence Platform</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Pipeline intelligence</p>
+        <h1>Sales Intelligence Platform</h1>
+      </div>
+      <a class="button secondary" href="/api/export/companies.csv">Export CSV</a>
+    </header>
+
+    <main class="layout">
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Add company</h2>
+          <span id="status" class="status">Ready</span>
+        </div>
+        <form id="company-form" class="form">
+          <label>
+            Company
+            <input name="name" required placeholder="Acme Inc." />
+          </label>
+          <label>
+            Domain
+            <input name="domain" required placeholder="acme.com" />
+          </label>
+          <label>
+            Industry
+            <input name="industry" required placeholder="SaaS" />
+          </label>
+          <label>
+            Country
+            <input name="country" required placeholder="United States" />
+          </label>
+          <label>
+            Employees
+            <input name="employee_count" type="number" min="0" value="50" />
+          </label>
+          <label>
+            Revenue USD
+            <input name="revenue_usd" type="number" min="0" value="1000000" />
+          </label>
+          <label class="wide">
+            Tech stack
+            <input name="tech_stack" placeholder="HubSpot, Stripe, Postgres" />
+          </label>
+          <label class="wide">
+            Notes
+            <textarea name="notes" rows="3" placeholder="Buying signals, pain points, current tools"></textarea>
+          </label>
+          <button class="button" type="submit">Add account</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>ICP scores</h2>
+          <span id="count" class="status">0 accounts</span>
+        </div>
+        <div id="scores" class="score-list"></div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

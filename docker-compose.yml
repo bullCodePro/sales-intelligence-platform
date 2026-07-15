@@ -1,0 +1,13 @@
+services:
+  api:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+      DATABASE_PATH: data/sales_intelligence.db
+    command: sh -c "python -m scripts.seed && python -m apps.api.server"
+    ports:
+      - "8000:8000"
