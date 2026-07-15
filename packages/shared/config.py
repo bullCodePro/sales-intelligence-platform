@@ -1,14 +1,13 @@
-from __future__ import annotations
-
-import os
-from dataclasses import dataclass
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-@dataclass(frozen=True)
-class Settings:
-    host: str = os.getenv("APP_HOST", "127.0.0.1")
-    port: int = int(os.getenv("APP_PORT", "8000"))
-    database_path: str = os.getenv("DATABASE_PATH", "data/sales_intelligence.db")
+class Settings(BaseSettings):
+    app_host: str = "127.0.0.1"
+    app_port: int = 8000
+    database_url: str = "postgresql+psycopg://sales:sales@localhost:5432/sales_intelligence"
+    default_organization_name: str = "Demo Organization"
+
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 
 settings = Settings()

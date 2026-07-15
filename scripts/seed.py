@@ -1,52 +1,53 @@
-from __future__ import annotations
-
 from packages.companies.repository import create_company, list_companies
-from packages.shared.db import ensure_database
-
-
-SAMPLE_COMPANIES = [
-    {
-        "name": "Northstar CRM",
-        "domain": "northstarcrm.com",
-        "industry": "SaaS",
-        "country": "United States",
-        "employee_count": 180,
-        "revenue_usd": 12_000_000,
-        "tech_stack": "Salesforce, Stripe, Snowflake",
-        "notes": "Growing sales operations team and active RevOps hiring.",
-    },
-    {
-        "name": "RioPay",
-        "domain": "riopay.com",
-        "industry": "Fintech",
-        "country": "Uruguay",
-        "employee_count": 75,
-        "revenue_usd": 3_500_000,
-        "tech_stack": "HubSpot, Postgres, Segment",
-        "notes": "Regional payments company expanding outbound motion.",
-    },
-    {
-        "name": "Old Harbor Logistics",
-        "domain": "oldharborlogistics.com",
-        "industry": "Logistics",
-        "country": "Canada",
-        "employee_count": 1400,
-        "revenue_usd": 50_000_000,
-        "tech_stack": "Excel, Oracle",
-        "notes": "Large account, lower ICP fit for current motion.",
-    },
-]
+from packages.companies.schemas import CompanyCreate
+from packages.icp.repository import create_icp
+from packages.icp.schemas import ICPCreate
+from packages.organizations.repository import create_organization
+from packages.organizations.schemas import OrganizationCreate
+from packages.shared.config import settings
+from packages.shared.database import SessionLocal
 
 
 def main() -> None:
-    ensure_database()
-    if list_companies():
-        print("Seed skipped: database already has companies.")
-        return
+    with SessionLocal() as session:
+        organization = create_organization(
+            session,
+            OrganizationCreate(
+                name=settings.default_organization_name,
+                description="Generic demo organization for local development.",
+            ),
+        )
+        if list_companies(session, organization.id):
+            print("Seed skipped: demo organization already has companies.")
+            return
 
-    for company in SAMPLE_COMPANIES:
-        create_company(company)
-    print(f"Seeded {len(SAMPLE_COMPANIES)} companies.")
+        create_icp(
+            session,
+            ICPCreate(
+                organization_id=organization.id,
+                name="Generic mid-market ICP",
+                description="Reusable sample ICP. Replace criteria per workspace or client.",
+                criteria={
+                    "industries": ["Software", "Retail", "Logistics"],
+                    "countries": ["United States", "Brazil", "Mexico"],
+                    "min_employees": 100,
+                    "max_employees": 2000,
+                },
+            ),
+        )
+        create_company(
+            session,
+            CompanyCreate(
+                organization_id=organization.id,
+                name="Example Target Account",
+                domain="example.com",
+                industry="Software",
+                country="United States",
+                employee_count=250,
+                confidence=0.8,
+            ),
+        )
+        print(f"Seeded organization {organization.id}.")
 
 
 if __name__ == "__main__":

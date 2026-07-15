@@ -1,12 +1,16 @@
 # Sales Intelligence Platform
 
-MVP para organizar empresas objetivo, contactos y scoring ICP desde una API local con una interfaz web simple.
+Plataforma genérica y multiempresa de inteligencia comercial y prospección B2B.
+
+El dominio principal es reusable para distintos clientes, países, sectores e ICPs. Los casos concretos viven como datos de `Organization`, `Workspace`, `ICP`, campañas o importaciones; no como lógica fija del código.
 
 ## Ejecutar
 
 ```bash
-python3 -m scripts.seed
-python3 -m apps.api.server
+uv sync
+docker compose up -d postgres redis
+uv run alembic upgrade head
+uv run sales-api
 ```
 
 Abrir:
@@ -18,19 +22,32 @@ http://127.0.0.1:8000
 ## Endpoints
 
 - `GET /api/health`
-- `GET /api/companies`
+- `POST /api/organizations`
+- `GET /api/organizations`
 - `POST /api/companies`
-- `GET /api/contacts`
-- `POST /api/contacts`
-- `GET /api/scores`
-- `GET /api/export/companies.csv`
+- `GET /api/companies?organization_id=...`
+- `POST /api/icps`
+- `GET /api/icps?organization_id=...`
+- `POST /api/imports/companies`
+- `POST /api/enrichment/companies/{company_id}/simulate`
 
 ## Estructura
 
-- `apps/api`: servidor HTTP y rutas JSON.
-- `apps/web`: dashboard web.
-- `packages/companies`: persistencia de cuentas objetivo.
-- `packages/contacts`: persistencia de contactos.
-- `packages/scoring`: cálculo de ICP.
-- `packages/exports`: exportación CSV.
-- `packages/shared`: base de datos y utilidades comunes.
+- `apps/api`: API FastAPI.
+- `apps/web`: frontend futuro.
+- `apps/worker`: jobs de importación, enriquecimiento y campañas.
+- `packages/organizations`: organizaciones y workspaces.
+- `packages/companies`: empresas, aliases y datos firmográficos.
+- `packages/contacts`: contactos y roles.
+- `packages/icp`: perfiles ideales y reglas.
+- `packages/enrichment`: proveedores simulados y contratos de integración.
+- `packages/imports`: importación Excel/CSV.
+- `packages/scoring`: cálculo de score.
+- `packages/shared`: configuración, base declarativa y sesión SQLAlchemy.
+
+## Principios
+
+- Todas las entidades de negocio incluyen `organization_id`.
+- No se inventan personas, emails ni cargos: los proveedores simulados solo generan datos marcados como simulados.
+- Cada dato enriquecido debe guardar fuente, fecha y confianza.
+- Los proveedores externos se conectan por interfaces, no por dependencias directas del dominio.

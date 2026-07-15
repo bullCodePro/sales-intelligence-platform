@@ -1,63 +1,36 @@
-from __future__ import annotations
+from uuid import UUID
 
-from typing import Any
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
-from packages.shared.db import connect
-
-
-COMPANY_FIELDS = (
-    "name",
-    "domain",
-    "industry",
-    "country",
-    "employee_count",
-    "revenue_usd",
-    "tech_stack",
-    "notes",
-)
+from packages.companies.models import Company
+from packages.companies.schemas import CompanyCreate
+from packages.shared.normalization import normalize_company_name
 
 
-def list_companies() -> list[dict[str, Any]]:
-    with connect() as connection:
-        rows = connection.execute(
-            """
-            SELECT id, name, domain, industry, country, employee_count, revenue_usd,
-                   tech_stack, notes, created_at
-            FROM companies
-            ORDER BY created_at DESC, id DESC
-            """
-        ).fetchall()
-    return [dict(row) for row in rows]
+def create_company(session: Session, payload: CompanyCreate) -> Company:
+    company = Company(
+        **payload.model_dump(),
+        normalized_name=normalize_company_name(payload.name),
+    )
+    session.add(company)
+    session.commit()
+    session.refresh(company)
+    return company
 
 
-def create_company(payload: dict[str, Any]) -> dict[str, Any]:
-    values = {
-        "name": str(payload.get("name", "")).strip(),
-        "domain": str(payload.get("domain", "")).strip(),
-        "industry": str(payload.get("industry", "")).strip(),
-        "country": str(payload.get("country", "")).strip(),
-        "employee_count": int(payload.get("employee_count") or 0),
-        "revenue_usd": int(payload.get("revenue_usd") or 0),
-        "tech_stack": str(payload.get("tech_stack", "")).strip(),
-        "notes": str(payload.get("notes", "")).strip(),
-    }
+def list_companies(session: Session, organization_id: UUID) -> list[Company]:
+    statement = (
+        select(Company)
+        .where(Company.organization_id == organization_id)
+        .order_by(Company.created_at.desc())
+    )
+    return list(session.scalars(statement))
 
-    missing = [field for field in ("name", "domain", "industry", "country") if not values[field]]
-    if missing:
-        raise ValueError(f"Missing required fields: {', '.join(missing)}")
 
-    with connect() as connection:
-        cursor = connection.execute(
-            """
-            INSERT INTO companies
-                (name, domain, industry, country, employee_count, revenue_usd, tech_stack, notes)
-            VALUES
-                (:name, :domain, :industry, :country, :employee_count, :revenue_usd, :tech_stack, :notes)
-            """,
-            values,
-        )
-        row = connection.execute(
-            "SELECT * FROM companies WHERE id = ?",
-            (cursor.lastrowid,),
-        ).fetchone()
-    return dict(row)
+def find_duplicate_by_name(session: Session, organization_id: UUID, name: str) -> Company | None:
+    statement = select(Company).where(
+        Company.organization_id == organization_id,
+        Company.normalized_name == normalize_company_name(name),
+    )
+    return session.scalar(statement)

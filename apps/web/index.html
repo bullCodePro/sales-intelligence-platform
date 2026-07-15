@@ -9,61 +9,48 @@
   <body>
     <header class="topbar">
       <div>
-        <p class="eyebrow">Pipeline intelligence</p>
+        <p class="eyebrow">Generic B2B intelligence</p>
         <h1>Sales Intelligence Platform</h1>
       </div>
-      <a class="button secondary" href="/api/export/companies.csv">Export CSV</a>
     </header>
 
     <main class="layout">
       <section class="panel">
         <div class="panel-header">
-          <h2>Add company</h2>
-          <span id="status" class="status">Ready</span>
+          <h2>API</h2>
+          <span id="api-status" class="status">Checking</span>
         </div>
-        <form id="company-form" class="form">
-          <label>
-            Company
-            <input name="name" required placeholder="Acme Inc." />
-          </label>
-          <label>
-            Domain
-            <input name="domain" required placeholder="acme.com" />
-          </label>
-          <label>
-            Industry
-            <input name="industry" required placeholder="SaaS" />
-          </label>
-          <label>
-            Country
-            <input name="country" required placeholder="United States" />
-          </label>
-          <label>
-            Employees
-            <input name="employee_count" type="number" min="0" value="50" />
-          </label>
-          <label>
-            Revenue USD
-            <input name="revenue_usd" type="number" min="0" value="1000000" />
-          </label>
-          <label class="wide">
-            Tech stack
-            <input name="tech_stack" placeholder="HubSpot, Stripe, Postgres" />
-          </label>
-          <label class="wide">
-            Notes
-            <textarea name="notes" rows="3" placeholder="Buying signals, pain points, current tools"></textarea>
-          </label>
-          <button class="button" type="submit">Add account</button>
-        </form>
+        <p class="muted">The backend is now a FastAPI service. Use the OpenAPI docs to create organizations, companies, ICPs and import jobs.</p>
+        <a class="button" href="/docs">Open API docs</a>
       </section>
 
       <section class="panel">
         <div class="panel-header">
-          <h2>ICP scores</h2>
-          <span id="count" class="status">0 accounts</span>
+          <h2>Scope</h2>
         </div>
-        <div id="scores" class="score-list"></div>
+        <div class="score-list">
+          <article class="score-card">
+            <div class="score-badge">1</div>
+            <div>
+              <h3>Multi-organization domain</h3>
+              <p>Core entities are scoped by organization_id.</p>
+            </div>
+          </article>
+          <article class="score-card">
+            <div class="score-badge tier-b">2</div>
+            <div>
+              <h3>Configurable ICPs</h3>
+              <p>Client-specific targeting lives in data, not hardcoded logic.</p>
+            </div>
+          </article>
+          <article class="score-card">
+            <div class="score-badge tier-c">3</div>
+            <div>
+              <h3>Provider adapters</h3>
+              <p>External sources plug into interfaces and keep confidence metadata.</p>
+            </div>
+          </article>
+        </div>
       </section>
     </main>
 
