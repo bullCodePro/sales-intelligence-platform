@@ -4,6 +4,7 @@ from uuid import UUID
 
 import uvicorn
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from packages.companies.repository import create_company, list_companies
@@ -22,6 +23,7 @@ from packages.organizations.schemas import (
 from packages.shared.database import get_session
 
 app = FastAPI(title="Sales Intelligence Platform", version="0.1.0")
+WEB_ROOT = Path(__file__).resolve().parents[1] / "web"
 
 
 @app.get("/api/health")
@@ -96,7 +98,10 @@ async def simulate_company_enrichment_endpoint(
 def run() -> None:
     from packages.shared.config import settings
 
-    uvicorn.run("apps.api.main:app", host=settings.app_host, port=settings.app_port, reload=True)
+    uvicorn.run("apps.api.main:app", host=settings.app_host, port=settings.app_port, reload=False)
+
+
+app.mount("/", StaticFiles(directory=WEB_ROOT, html=True), name="web")
 
 
 if __name__ == "__main__":
