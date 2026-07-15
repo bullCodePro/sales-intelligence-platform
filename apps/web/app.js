@@ -10,8 +10,12 @@ async function fetchJson(url, options = {}) {
   return payload;
 }
 
-fetchJson("/api/health").then((payload) => {
-  document.querySelector("#api-status").textContent = payload.status;
-}).catch((error) => {
-  document.querySelector("#api-status").textContent = error.message;
-});
+const apiStatus = document.querySelector("#api-status");
+
+fetchJson("/api/health")
+  .then((payload) => {
+    apiStatus.textContent = payload.status === "ok" ? "Online" : payload.status;
+  })
+  .catch((error) => {
+    apiStatus.textContent = error.message;
+  });

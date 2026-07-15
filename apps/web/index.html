@@ -7,52 +7,219 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">Generic B2B intelligence</p>
-        <h1>Sales Intelligence Platform</h1>
-      </div>
-    </header>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">SI</div>
+          <div>
+            <strong>Sales Intel</strong>
+            <span>Multi-org platform</span>
+          </div>
+        </div>
 
-    <main class="layout">
-      <section class="panel">
-        <div class="panel-header">
-          <h2>API</h2>
-          <span id="api-status" class="status">Checking</span>
-        </div>
-        <p class="muted">The backend is now a FastAPI service. Use the OpenAPI docs to create organizations, companies, ICPs and import jobs.</p>
-        <a class="button" href="/docs">Open API docs</a>
-      </section>
+        <nav class="nav-list" aria-label="Main navigation">
+          <a class="nav-item active" href="#">Dashboard</a>
+          <a class="nav-item" href="/docs">API Docs</a>
+          <a class="nav-item" href="#">Companies</a>
+          <a class="nav-item" href="#">ICPs</a>
+          <a class="nav-item" href="#">Campaigns</a>
+          <a class="nav-item" href="#">Pipeline</a>
+        </nav>
 
-      <section class="panel">
-        <div class="panel-header">
-          <h2>Scope</h2>
+        <div class="sidebar-card">
+          <span class="label">API status</span>
+          <strong id="api-status">Checking</strong>
+          <p>FastAPI is serving this workspace locally.</p>
         </div>
-        <div class="score-list">
-          <article class="score-card">
-            <div class="score-badge">1</div>
-            <div>
-              <h3>Multi-organization domain</h3>
-              <p>Core entities are scoped by organization_id.</p>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Revenue operations workspace</p>
+            <h1>Prospecting command center</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="icon-button" type="button" title="Refresh data" aria-label="Refresh data">
+              ↻
+            </button>
+            <a class="button secondary" href="/docs">Open API</a>
+            <button class="button" type="button">Import list</button>
+          </div>
+        </header>
+
+        <section class="metric-grid" aria-label="Workspace metrics">
+          <article class="metric-card">
+            <span class="label">Target accounts</span>
+            <strong>1,284</strong>
+            <small>+168 this week</small>
+          </article>
+          <article class="metric-card">
+            <span class="label">Deduped</span>
+            <strong>92%</strong>
+            <small>116 duplicate rows merged</small>
+          </article>
+          <article class="metric-card">
+            <span class="label">Enriched</span>
+            <strong>641</strong>
+            <small>Domain, sector, size</small>
+          </article>
+          <article class="metric-card">
+            <span class="label">Tier A</span>
+            <strong>84</strong>
+            <small>Ready for campaign</small>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <article class="panel lead-panel">
+            <div class="panel-header">
+              <div>
+                <span class="label">Prioritization</span>
+                <h2>Highest-fit companies</h2>
+              </div>
+              <div class="segmented" aria-label="Priority filter">
+                <button class="selected" type="button">All</button>
+                <button type="button">Tier A</button>
+                <button type="button">Needs review</button>
+              </div>
+            </div>
+
+            <div class="table">
+              <div class="table-row table-head">
+                <span>Company</span>
+                <span>ICP</span>
+                <span>Signals</span>
+                <span>Score</span>
+              </div>
+              <div class="table-row">
+                <span>
+                  <strong>Northstar Operations</strong>
+                  <small>northstar.example</small>
+                </span>
+                <span>Retail expansion</span>
+                <span>Large frontline team, multiple sites</span>
+                <span class="score good">91</span>
+              </div>
+              <div class="table-row">
+                <span>
+                  <strong>Atlas Fulfillment</strong>
+                  <small>atlas.example</small>
+                </span>
+                <span>Logistics growth</span>
+                <span>Hiring velocity, shift workforce</span>
+                <span class="score good">87</span>
+              </div>
+              <div class="table-row">
+                <span>
+                  <strong>Bluebird Services</strong>
+                  <small>bluebird.example</small>
+                </span>
+                <span>Operational workforce</span>
+                <span>Size confirmed, contacts pending</span>
+                <span class="score warn">73</span>
+              </div>
+              <div class="table-row">
+                <span>
+                  <strong>Meridian Health Group</strong>
+                  <small>meridian.example</small>
+                </span>
+                <span>Healthcare teams</span>
+                <span>Domain verified, size inferred</span>
+                <span class="score warn">68</span>
+              </div>
             </div>
           </article>
-          <article class="score-card">
-            <div class="score-badge tier-b">2</div>
-            <div>
-              <h3>Configurable ICPs</h3>
-              <p>Client-specific targeting lives in data, not hardcoded logic.</p>
+
+          <aside class="panel">
+            <div class="panel-header">
+              <div>
+                <span class="label">Import pipeline</span>
+                <h2>Current batch</h2>
+              </div>
+              <span class="pill active">Running</span>
+            </div>
+
+            <ol class="timeline">
+              <li class="done">
+                <strong>Upload</strong>
+                <span>Excel received, 1,420 rows</span>
+              </li>
+              <li class="done">
+                <strong>Normalize</strong>
+                <span>Company names standardized</span>
+              </li>
+              <li class="active">
+                <strong>Deduplicate</strong>
+                <span>Matching aliases and domains</span>
+              </li>
+              <li>
+                <strong>Enrich</strong>
+                <span>Provider adapters queued</span>
+              </li>
+              <li>
+                <strong>Score</strong>
+                <span>Apply workspace ICPs</span>
+              </li>
+            </ol>
+          </aside>
+        </section>
+
+        <section class="content-grid bottom-grid">
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <span class="label">ICP configuration</span>
+                <h2>Active profiles</h2>
+              </div>
+            </div>
+            <div class="icp-list">
+              <div class="icp-card">
+                <strong>Retail expansion</strong>
+                <p>200+ employees, operational roles, multiple locations.</p>
+                <div class="chips">
+                  <span>Retail</span>
+                  <span>Workforce-heavy</span>
+                  <span>HR sponsor</span>
+                </div>
+              </div>
+              <div class="icp-card">
+                <strong>Logistics growth</strong>
+                <p>Warehouses, transport fleets, shift-based teams.</p>
+                <div class="chips">
+                  <span>Logistics</span>
+                  <span>High rotation</span>
+                  <span>Multi-site</span>
+                </div>
+              </div>
             </div>
           </article>
-          <article class="score-card">
-            <div class="score-badge tier-c">3</div>
-            <div>
-              <h3>Provider adapters</h3>
-              <p>External sources plug into interfaces and keep confidence metadata.</p>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <span class="label">Data quality</span>
+                <h2>Review queue</h2>
+              </div>
+            </div>
+            <div class="quality-list">
+              <div>
+                <strong>Contact confidence below 60%</strong>
+                <span>38 records</span>
+              </div>
+              <div>
+                <strong>Company size inferred</strong>
+                <span>112 records</span>
+              </div>
+              <div>
+                <strong>Missing corporate domain</strong>
+                <span>74 records</span>
+              </div>
             </div>
           </article>
-        </div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </div>
 
     <script src="/app.js"></script>
   </body>
