@@ -13,61 +13,136 @@
           <div class="brand-mark">SI</div>
           <div>
             <strong>Sales Intel</strong>
-            <span>Multi-org platform</span>
+            <span>Prospecting workspace</span>
           </div>
         </div>
 
         <nav class="nav-list" aria-label="Main navigation">
-          <a class="nav-item active" href="#">Dashboard</a>
+          <a class="nav-item active" href="#builder">Search Builder</a>
+          <a class="nav-item" href="#companies">Companies</a>
+          <a class="nav-item" href="#review">Review</a>
           <a class="nav-item" href="/docs">API Docs</a>
-          <a class="nav-item" href="#">Companies</a>
-          <a class="nav-item" href="#">ICPs</a>
-          <a class="nav-item" href="#">Campaigns</a>
-          <a class="nav-item" href="#">Pipeline</a>
         </nav>
 
         <div class="sidebar-card">
           <span class="label">API status</span>
           <strong id="api-status">Checking</strong>
-          <p>FastAPI is serving this workspace locally.</p>
+          <p>The UI works locally now; database-backed actions will connect next.</p>
         </div>
       </aside>
 
       <main class="workspace">
         <header class="topbar">
           <div>
-            <p class="eyebrow">Revenue operations workspace</p>
-            <h1>Prospecting command center</h1>
+            <p class="eyebrow">Custom prospecting</p>
+            <h1>Build a client search</h1>
           </div>
           <div class="topbar-actions">
-            <button class="icon-button" type="button" title="Refresh data" aria-label="Refresh data">
-              ↻
-            </button>
-            <a class="button secondary" href="/docs">Open API</a>
-            <button class="button" type="button">Import list</button>
+            <button class="button secondary" id="load-demo" type="button">Load demo</button>
+            <button class="button danger" id="reset-workspace" type="button">Reset</button>
           </div>
         </header>
 
         <section class="metric-grid" aria-label="Workspace metrics">
           <article class="metric-card">
-            <span class="label">Target accounts</span>
-            <strong>1,284</strong>
-            <small>+168 this week</small>
+            <span class="label">Client</span>
+            <strong id="metric-client">New client</strong>
+            <small id="metric-market">No market configured</small>
           </article>
           <article class="metric-card">
-            <span class="label">Deduped</span>
-            <strong>92%</strong>
-            <small>116 duplicate rows merged</small>
-          </article>
-          <article class="metric-card">
-            <span class="label">Enriched</span>
-            <strong>641</strong>
-            <small>Domain, sector, size</small>
+            <span class="label">Target companies</span>
+            <strong id="metric-companies">0</strong>
+            <small>Editable from the UI</small>
           </article>
           <article class="metric-card">
             <span class="label">Tier A</span>
-            <strong>84</strong>
-            <small>Ready for campaign</small>
+            <strong id="metric-tier-a">0</strong>
+            <small>Based on current ICP</small>
+          </article>
+          <article class="metric-card">
+            <span class="label">Contacts to find</span>
+            <strong id="metric-roles">0</strong>
+            <small>Role categories configured</small>
+          </article>
+        </section>
+
+        <section class="builder-grid" id="builder">
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <span class="label">Step 1</span>
+                <h2>Client and market</h2>
+              </div>
+            </div>
+
+            <form class="form" id="workspace-form">
+              <label>
+                Client / organization
+                <input id="client-name" name="clientName" placeholder="Example: Organization A" />
+              </label>
+              <label>
+                Workspace
+                <input id="workspace-name" name="workspaceName" placeholder="Example: Retail expansion" />
+              </label>
+              <label>
+                Target country
+                <input id="target-country" name="targetCountry" placeholder="Example: Uruguay" />
+              </label>
+              <label>
+                ICP name
+                <input id="icp-name" name="icpName" placeholder="Example: Operational workforce 200+" />
+              </label>
+            </form>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <span class="label">Step 2</span>
+                <h2>ICP criteria</h2>
+              </div>
+            </div>
+
+            <form class="form" id="icp-form">
+              <label>
+                Minimum employees
+                <input id="min-employees" name="minEmployees" type="number" min="0" value="200" />
+              </label>
+              <label>
+                Maximum employees
+                <input id="max-employees" name="maxEmployees" type="number" min="0" placeholder="Optional" />
+              </label>
+              <label class="wide">
+                Target sectors
+                <input id="target-sectors" name="targetSectors" placeholder="Retail, Logistics, Healthcare" />
+              </label>
+              <label class="wide">
+                Positive signals
+                <textarea id="positive-signals" name="positiveSignals" rows="3" placeholder="Multiple locations, shift work, operational staff, hiring frequently"></textarea>
+              </label>
+              <label class="wide">
+                Contact roles to find
+                <input id="target-roles" name="targetRoles" placeholder="HR Manager, CFO, People Operations, Benefits Manager" />
+              </label>
+            </form>
+          </article>
+
+          <article class="panel company-panel" id="companies">
+            <div class="panel-header">
+              <div>
+                <span class="label">Step 3</span>
+                <h2>Add companies to evaluate</h2>
+              </div>
+            </div>
+
+            <form class="company-entry" id="company-form">
+              <input name="name" required placeholder="Company name" />
+              <input name="sector" required placeholder="Sector" />
+              <input name="country" required placeholder="Country" />
+              <input name="employees" required type="number" min="0" placeholder="Employees" />
+              <input name="signals" placeholder="Signals: multiple locations, shifts..." />
+              <button class="button" type="submit">Add</button>
+            </form>
           </article>
         </section>
 
@@ -75,148 +150,29 @@
           <article class="panel lead-panel">
             <div class="panel-header">
               <div>
-                <span class="label">Prioritization</span>
-                <h2>Highest-fit companies</h2>
+                <span class="label">Live scoring</span>
+                <h2>Prioritized companies</h2>
               </div>
               <div class="segmented" aria-label="Priority filter">
-                <button class="selected" type="button">All</button>
-                <button type="button">Tier A</button>
-                <button type="button">Needs review</button>
+                <button class="selected" data-filter="all" type="button">All</button>
+                <button data-filter="A" type="button">Tier A</button>
+                <button data-filter="review" type="button">Review</button>
               </div>
             </div>
 
-            <div class="table">
-              <div class="table-row table-head">
-                <span>Company</span>
-                <span>ICP</span>
-                <span>Signals</span>
-                <span>Score</span>
-              </div>
-              <div class="table-row">
-                <span>
-                  <strong>Northstar Operations</strong>
-                  <small>northstar.example</small>
-                </span>
-                <span>Retail expansion</span>
-                <span>Large frontline team, multiple sites</span>
-                <span class="score good">91</span>
-              </div>
-              <div class="table-row">
-                <span>
-                  <strong>Atlas Fulfillment</strong>
-                  <small>atlas.example</small>
-                </span>
-                <span>Logistics growth</span>
-                <span>Hiring velocity, shift workforce</span>
-                <span class="score good">87</span>
-              </div>
-              <div class="table-row">
-                <span>
-                  <strong>Bluebird Services</strong>
-                  <small>bluebird.example</small>
-                </span>
-                <span>Operational workforce</span>
-                <span>Size confirmed, contacts pending</span>
-                <span class="score warn">73</span>
-              </div>
-              <div class="table-row">
-                <span>
-                  <strong>Meridian Health Group</strong>
-                  <small>meridian.example</small>
-                </span>
-                <span>Healthcare teams</span>
-                <span>Domain verified, size inferred</span>
-                <span class="score warn">68</span>
-              </div>
-            </div>
+            <div class="table" id="company-table"></div>
           </article>
 
-          <aside class="panel">
+          <aside class="panel" id="review">
             <div class="panel-header">
               <div>
-                <span class="label">Import pipeline</span>
-                <h2>Current batch</h2>
+                <span class="label">Search brief</span>
+                <h2>What the platform will look for</h2>
               </div>
-              <span class="pill active">Running</span>
             </div>
 
-            <ol class="timeline">
-              <li class="done">
-                <strong>Upload</strong>
-                <span>Excel received, 1,420 rows</span>
-              </li>
-              <li class="done">
-                <strong>Normalize</strong>
-                <span>Company names standardized</span>
-              </li>
-              <li class="active">
-                <strong>Deduplicate</strong>
-                <span>Matching aliases and domains</span>
-              </li>
-              <li>
-                <strong>Enrich</strong>
-                <span>Provider adapters queued</span>
-              </li>
-              <li>
-                <strong>Score</strong>
-                <span>Apply workspace ICPs</span>
-              </li>
-            </ol>
+            <div class="brief" id="search-brief"></div>
           </aside>
-        </section>
-
-        <section class="content-grid bottom-grid">
-          <article class="panel">
-            <div class="panel-header">
-              <div>
-                <span class="label">ICP configuration</span>
-                <h2>Active profiles</h2>
-              </div>
-            </div>
-            <div class="icp-list">
-              <div class="icp-card">
-                <strong>Retail expansion</strong>
-                <p>200+ employees, operational roles, multiple locations.</p>
-                <div class="chips">
-                  <span>Retail</span>
-                  <span>Workforce-heavy</span>
-                  <span>HR sponsor</span>
-                </div>
-              </div>
-              <div class="icp-card">
-                <strong>Logistics growth</strong>
-                <p>Warehouses, transport fleets, shift-based teams.</p>
-                <div class="chips">
-                  <span>Logistics</span>
-                  <span>High rotation</span>
-                  <span>Multi-site</span>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="panel">
-            <div class="panel-header">
-              <div>
-                <span class="label">Data quality</span>
-                <h2>Review queue</h2>
-              </div>
-            </div>
-            <div class="quality-list">
-              <div>
-                <strong>Contact confidence below 60%</strong>
-                <span>38 records</span>
-              </div>
-              <div>
-                <strong>Company size inferred</strong>
-                <span>112 records</span>
-              </div>
-              <div>
-                <strong>Missing corporate domain</strong>
-                <span>74 records</span>
-              </div>
-            </div>
-          </article>
         </section>
       </main>
     </div>
