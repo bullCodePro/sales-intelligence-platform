@@ -11,6 +11,7 @@ env/
 *.db
 *.sqlite
 data/output/*.csv
+data/workspace_state.json
 node_modules/
 dist/
 build/

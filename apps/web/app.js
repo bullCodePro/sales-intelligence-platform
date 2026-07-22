@@ -46,6 +46,8 @@ const demoCompanies = [
 ];
 
 let state = loadState();
+let saveTimer = null;
+let hasLoadedServerState = false;
 
 const fields = {
   clientName: document.querySelector("#client-name"),
@@ -64,6 +66,9 @@ const companyTable = document.querySelector("#company-table");
 const searchBrief = document.querySelector("#search-brief");
 const segmented = document.querySelector(".segmented");
 const apiStatus = document.querySelector("#api-status");
+const saveStatus = document.querySelector("#save-status");
+const bulkCompanies = document.querySelector("#bulk-companies");
+const importBulk = document.querySelector("#import-bulk");
 
 async function fetchJson(url, options = {}) {
   const response = await fetch(url, {
@@ -84,6 +89,28 @@ function loadState() {
 
 function saveState() {
   localStorage.setItem(storageKey, JSON.stringify(state));
+  if (hasLoadedServerState) {
+    queueServerSave();
+  }
+}
+
+function queueServerSave() {
+  saveStatus.textContent = "Saving changes";
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveStateToServer, 350);
+}
+
+async function saveStateToServer() {
+  try {
+    const payload = await fetchJson("/api/workspace-state", {
+      method: "PUT",
+      body: JSON.stringify(state),
+    });
+    state = { ...state, ...payload.state };
+    saveStatus.textContent = "Saved to local API";
+  } catch (error) {
+    saveStatus.textContent = "Saved in browser only";
+  }
 }
 
 function toList(value) {
@@ -165,6 +192,8 @@ function renderMetrics() {
     scored.filter((company) => company.tier === "A").length,
   );
   document.querySelector("#metric-roles").textContent = String(toList(state.targetRoles).length);
+  document.querySelector("#company-count-pill").textContent =
+    `${state.companies.length} compan${state.companies.length === 1 ? "y" : "ies"}`;
 }
 
 function renderTable() {
@@ -305,9 +334,28 @@ document.querySelector("#load-demo").addEventListener("click", () => {
   render();
 });
 
-document.querySelector("#reset-workspace").addEventListener("click", () => {
+document.querySelector("#reset-workspace").addEventListener("click", async () => {
   state = { ...defaultState };
   localStorage.removeItem(storageKey);
+  try {
+    const payload = await fetchJson("/api/workspace-state/reset", { method: "POST" });
+    state = { ...defaultState, ...payload.state };
+    saveStatus.textContent = "Workspace reset";
+  } catch (error) {
+    saveStatus.textContent = "Reset in browser only";
+  }
+  render();
+});
+
+importBulk.addEventListener("click", () => {
+  const imported = parseCompanyRows(bulkCompanies.value);
+  if (!imported.length) {
+    saveStatus.textContent = "No valid rows to import";
+    return;
+  }
+  state.companies = mergeCompanies(state.companies, imported);
+  bulkCompanies.value = "";
+  saveStatus.textContent = `Imported ${imported.length} rows`;
   render();
 });
 
@@ -319,4 +367,41 @@ fetchJson("/api/health")
     apiStatus.textContent = error.message;
   });
 
-render();
+loadWorkspaceFromServer();
+
+async function loadWorkspaceFromServer() {
+  try {
+    const serverState = await fetchJson("/api/workspace-state");
+    state = { ...defaultState, ...state, ...serverState };
+    hasLoadedServerState = true;
+    saveStatus.textContent = "Workspace loaded";
+  } catch (error) {
+    hasLoadedServerState = true;
+    saveStatus.textContent = "Using browser workspace";
+  }
+  render();
+}
+
+function parseCompanyRows(text) {
+  return String(text || "")
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter((line, index) => !(index === 0 && /company|empresa|sector/i.test(line)))
+    .map((line) => line.split(/\t|,/).map((cell) => cell.trim()))
+    .filter((cells) => cells.length >= 4)
+    .map(([name, sector, country, employees, ...signals]) => ({
+      name,
+      sector,
+      country,
+      employees: Number(String(employees).replace(/[^0-9]/g, "") || 0),
+      signals: signals.join(", "),
+    }))
+    .filter((company) => company.name && company.sector && company.country);
+}
+
+function mergeCompanies(existing, imported) {
+  const byName = new Map(existing.map((company) => [normalize(company.name), company]));
+  imported.forEach((company) => byName.set(normalize(company.name), company));
+  return Array.from(byName.values());
+}

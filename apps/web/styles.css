@@ -286,6 +286,22 @@ label {
   align-items: end;
 }
 
+.bulk-import {
+  display: grid;
+  gap: 10px;
+}
+
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .content-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(300px, 0.8fr);

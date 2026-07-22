@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from uuid import UUID
@@ -5,6 +6,7 @@ from uuid import UUID
 import uvicorn
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from packages.companies.repository import create_company, list_companies
@@ -24,11 +26,59 @@ from packages.shared.database import get_session
 
 app = FastAPI(title="Sales Intelligence Platform", version="0.1.0")
 WEB_ROOT = Path(__file__).resolve().parents[1] / "web"
+STATE_PATH = Path("data/workspace_state.json")
+
+
+DEFAULT_WORKSPACE_STATE = {
+    "clientName": "New client",
+    "workspaceName": "Prospecting workspace",
+    "targetCountry": "",
+    "icpName": "Custom ICP",
+    "minEmployees": 200,
+    "maxEmployees": "",
+    "targetSectors": "Retail, Logistics, Healthcare",
+    "positiveSignals": "Multiple locations, shift work, operational staff, frequent hiring",
+    "targetRoles": "HR Manager, People Operations, CFO, Benefits Manager",
+    "companies": [],
+    "filter": "all",
+}
+
+
+class WorkspaceState(BaseModel):
+    clientName: str = "New client"
+    workspaceName: str = "Prospecting workspace"
+    targetCountry: str = ""
+    icpName: str = "Custom ICP"
+    minEmployees: int | str = 200
+    maxEmployees: int | str = ""
+    targetSectors: str = ""
+    positiveSignals: str = ""
+    targetRoles: str = ""
+    companies: list[dict] = Field(default_factory=list)
+    filter: str = "all"
 
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/api/workspace-state")
+def get_workspace_state() -> dict:
+    return _read_workspace_state()
+
+
+@app.put("/api/workspace-state")
+def save_workspace_state(payload: WorkspaceState) -> dict:
+    state = {**DEFAULT_WORKSPACE_STATE, **payload.model_dump()}
+    _write_workspace_state(state)
+    return {"status": "saved", "state": state}
+
+
+@app.post("/api/workspace-state/reset")
+def reset_workspace_state() -> dict:
+    _write_workspace_state(DEFAULT_WORKSPACE_STATE)
+    return {"status": "reset", "state": DEFAULT_WORKSPACE_STATE}
 
 
 @app.post("/api/organizations", response_model=OrganizationRead, status_code=201)
@@ -102,6 +152,19 @@ def run() -> None:
 
 
 app.mount("/", StaticFiles(directory=WEB_ROOT, html=True), name="web")
+
+
+def _read_workspace_state() -> dict:
+    if not STATE_PATH.exists():
+        return DEFAULT_WORKSPACE_STATE
+    return {**DEFAULT_WORKSPACE_STATE, **json.loads(STATE_PATH.read_text(encoding="utf-8"))}
+
+
+def _write_workspace_state(state: dict) -> None:
+    STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path = STATE_PATH.with_suffix(".tmp")
+    temporary_path.write_text(json.dumps(state, indent=2), encoding="utf-8")
+    temporary_path.replace(STATE_PATH)
 
 
 if __name__ == "__main__":

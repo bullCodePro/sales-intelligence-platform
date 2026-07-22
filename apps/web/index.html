@@ -27,7 +27,7 @@
         <div class="sidebar-card">
           <span class="label">API status</span>
           <strong id="api-status">Checking</strong>
-          <p>The UI works locally now; database-backed actions will connect next.</p>
+          <p id="save-status">Loading workspace</p>
         </div>
       </aside>
 
@@ -133,6 +133,7 @@
                 <span class="label">Step 3</span>
                 <h2>Add companies to evaluate</h2>
               </div>
+              <span class="pill" id="company-count-pill">0 companies</span>
             </div>
 
             <form class="company-entry" id="company-form">
@@ -143,6 +144,23 @@
               <input name="signals" placeholder="Signals: multiple locations, shifts..." />
               <button class="button" type="submit">Add</button>
             </form>
+          </article>
+
+          <article class="panel company-panel">
+            <div class="panel-header">
+              <div>
+                <span class="label">Bulk import</span>
+                <h2>Paste a list from Excel or CSV</h2>
+              </div>
+            </div>
+
+            <div class="bulk-import">
+              <textarea id="bulk-companies" rows="5" placeholder="Company, Sector, Country, Employees, Signals&#10;Example Retail, Retail, Uruguay, 240, Multiple locations and shift work"></textarea>
+              <div class="bulk-actions">
+                <button class="button secondary" id="import-bulk" type="button">Import rows</button>
+                <span class="hint">Comma or tab separated. Header row is optional.</span>
+              </div>
+            </div>
           </article>
         </section>
 
